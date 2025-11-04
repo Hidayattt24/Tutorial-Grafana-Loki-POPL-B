@@ -24,9 +24,20 @@ body {
 
 /* Header */
 header {
-  text-align: center;
   margin-bottom: 2rem;
   color: white;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+}
+
+.header-text {
+  text-align: left;
+  flex: 1;
 }
 
 header h1 {
@@ -38,6 +49,31 @@ header h1 {
 header p {
   font-size: 1.1rem;
   opacity: 0.9;
+}
+
+.header-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.btn-logs {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  color: white;
+  text-decoration: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  white-space: nowrap;
+}
+
+.btn-logs:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
 }
 
 /* Main Content */
@@ -425,8 +461,24 @@ footer {
     padding: 10px;
   }
 
+  .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .header-text {
+    text-align: center;
+    width: 100%;
+  }
+
   header h1 {
     font-size: 2rem;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: center;
   }
 
   main {

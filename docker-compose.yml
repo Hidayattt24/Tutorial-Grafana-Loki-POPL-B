@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   notes-app:
     build: .
@@ -8,6 +6,10 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3000
+      - LOG_LEVEL=info
+      - GRAFANA_URL=http://localhost:3001
+    volumes:
+      - app-logs:/var/log/app
     restart: unless-stopped
     healthcheck:
       test:
@@ -21,7 +23,64 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+    networks:
+      - loki-network
+    depends_on:
+      - loki
+
+  # Loki - Log aggregation system
+  loki:
+    image: grafana/loki:2.9.3
+    user: "0"
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./loki-config.yml:/etc/loki/local-config.yaml
+      - loki-data:/tmp/loki
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - loki-network
+    restart: unless-stopped
+
+  # Promtail - Log collector
+  promtail:
+    image: grafana/promtail:2.9.3
+    volumes:
+      - ./promtail-config.yml:/etc/promtail/config.yml
+      - app-logs:/var/log/app
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: -config.file=/etc/promtail/config.yml
+    networks:
+      - loki-network
+    depends_on:
+      - loki
+    restart: unless-stopped
+
+  # Grafana - Visualization dashboard
+  grafana:
+    image: grafana/grafana:10.2.3
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SECURITY_ADMIN_USER=admin
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml
+    networks:
+      - loki-network
+    depends_on:
+      - loki
+    restart: unless-stopped
+
+volumes:
+  app-logs:
+  loki-data:
+  grafana-data:
 
 networks:
-  default:
-    name: notes-app-network
+  loki-network:
+    name: loki-network
+    driver: bridge

@@ -17,6 +17,9 @@ COPY . .
 RUN addgroup -g 1001 -S nodejs
 RUN adduser -S notes -u 1001
 
+# Create log directory
+RUN mkdir -p /var/log/app && chown -R notes:nodejs /var/log/app
+
 # Change ownership of app directory to notes user
 RUN chown -R notes:nodejs /app
 USER notes
